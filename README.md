@@ -70,3 +70,16 @@ You only need to do this once. Open RetroArch and navigate to the settings:
 4. Have fun!
 
 VOICEVOX and the server tool needs to be running during your gaming session.
+
+---
+
+## ⚙️ Customization (Voice, Volume, and Speed)
+You can easily change how the AI voice sounds to perfectly match the game you are playing. 
+
+Open your `server.py` file in a text editor. Right at the very top of the script, you will see a `--- CONFIGURATION ---` block with three variables you can change:
+
+* **`VOICEVOX_SPEAKER_ID` (The Character Voice):** The VOICEVOX app comes with dozens of different characters (young heroes, narrators, mascots, etc.). Each character has a specific ID number. The default is `23` (a neutral female voice). You can change this number to cast a different voice actor! Try `13` for a neutral male, `3` for an energetic mascot, or experiment with numbers between `0` and `50` to find your favorite.
+* **`VOICEVOX_SPEED_SCALE` (Reading Speed):** `1.0` is the normal speaking speed. The script defaults to `1.15`, which is comfortably faster for gaming. If you are a beginner and want them to speak slower so you can catch every syllable, try `0.8` or `0.9`. 
+* **`VOICEVOX_VOLUME_SCALE` (Loudness):** Game music can be loud! `1.0` is the baseline volume. The script defaults to `2.0` to help the voice cut through the retro music. If it's still too quiet, bump it up to `3.0` or higher.
+
+Whenever you change these numbers, just save the `server.py` file and restart the server in your Terminal for the changes to take effect!
