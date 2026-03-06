@@ -8,20 +8,20 @@ from Foundation import NSData
 import requests
 import tempfile
 import os
+from PIL import Image
+import io
 
 app = Flask(__name__)
 print("Loading Apple Vision AI & Connecting to VOICEVOX...")
 
 # --- CONFIGURATION ---
-# 8 = Kasukabe Tsumugi (Neutral Female)
-# 13 = Aoyama Ryusei (Neutral Male)
 VOICEVOX_SPEAKER_ID = 23
-
-# 1.0 is normal speed. 1.3 is comfortably faster.
 VOICEVOX_SPEED_SCALE = 1.15 
+VOICEVOX_VOLUME_SCALE = 2.0 
 
-# 1.0 is normal volume. Increase this (e.g., 1.5 or 2.0) to make it louder.
-VOICEVOX_VOLUME_SCALE = 2
+# Shrinks 4K/Retina screenshots down to speed up AI processing. 
+# 1024 is plenty large enough for SNES/GBA pixel fonts.
+MAX_IMAGE_WIDTH = 1024 
 # ---------------------
 
 def recognize_japanese_text(image_bytes):
@@ -70,7 +70,7 @@ def play_voicevox(text):
         synth_res = requests.post("http://127.0.0.1:50021/synthesis", params=synth_payload, json=query_data)
         synth_res.raise_for_status()
         
-        # 4. Save it and play it
+        # 4. Save it and play it using macOS's native audio player
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as f:
             f.write(synth_res.content)
             temp_filename = f.name
@@ -97,6 +97,22 @@ def translate(path):
                 raise ValueError("JSON received, but no 'image' key found.")
         except json.JSONDecodeError:
             image_bytes = raw_data
+
+        # --- NEW: SHRINK IMAGE TO SPEED UP PROCESSING ---
+        img = Image.open(io.BytesIO(image_bytes))
+        if img.width > MAX_IMAGE_WIDTH:
+            # Calculate the new height to maintain the exact aspect ratio
+            ratio = MAX_IMAGE_WIDTH / img.width
+            new_height = int(img.height * ratio)
+            
+            # Resize it cleanly
+            img = img.resize((MAX_IMAGE_WIDTH, new_height), Image.Resampling.LANCZOS)
+            
+            # Convert it back to raw bytes for Apple Vision to read
+            byte_io = io.BytesIO()
+            img.save(byte_io, format='PNG')
+            image_bytes = byte_io.getvalue()
+        # ------------------------------------------------
 
         text = recognize_japanese_text(image_bytes)
         print(f"Detected Text: {text}")

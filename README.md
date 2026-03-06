@@ -46,7 +46,7 @@ Open your Mac's Terminal app and run these commands one by one:
 ### Step 4: Install Dependencies
 Run this command in the Terminal:
 
-    pip3 install flask pyobjc-framework-Vision pyobjc-framework-Quartz requests
+    pip3 install flask pyobjc-framework-Vision pyobjc-framework-Quartz requests pillow
 
 ### Step 5: Create the Script
 Download the `server.py` from this repository into your folder
@@ -63,9 +63,11 @@ You only need to do this once. Open RetroArch and navigate to the settings:
 ## 🎮 How to Play
 1. Open VOICEVOX.
 2. Open a new terminal and run these commands to start the tool:
-    cd ~/RetroArch_AI_Server
-    source venv/bin/activate
-    python3 server.py
+```bash
+cd ~/RetroArch_AI_Server
+source venv/bin/activate
+python3 server.py
+```
 3. Open RetroArch and run your game
 4. Have fun!
 
