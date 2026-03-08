@@ -1,6 +1,6 @@
 # RetroArch Local Japanese TTS Server (macOS Apple Silicon)
 
-This project allows you to play Japanese retro games in RetroArch and hear the on-screen text read out loud instantly by a high-quality, anime-style AI voice. 
+This project allows you to play Japanese retro games in RetroArch and hear the on-screen text read out loud instantly by a high-quality, anime-style AI voice. It also features a real-time web interface, allowing you to instantly look up unknown Kanji using browser dictionary extensions!
 
 It is designed specifically for Japanese learners who want to practice their listening and reading skills using native game material. Unlike cloud services like zTranslate, this setup runs **100% locally on your Mac**.
 
@@ -12,6 +12,7 @@ It is designed specifically for Japanese learners who want to practice their lis
 3. The server scrubs the text to remove line-breaks so the sentence flows naturally.
 4. The server hands the text over to **VOICEVOX**.
 5. VOICEVOX generates the audio, and your Mac plays it instantly.
+6. The server simultaneously pushes the text to a local webpage, allowing you to seamlessly hover over the characters with Yomitan/Yomichan.
 
 ---
 
@@ -46,42 +47,56 @@ Open your Mac's Terminal app and run these commands one by one:
 ### Step 4: Install Dependencies
 Run this command in the Terminal:
 
-    pip3 install flask pyobjc-framework-Vision pyobjc-framework-Quartz requests pillow
+    pip3 install flask pyobjc-framework-Vision pyobjc-framework-Quartz requests pillow "urllib3<2"
 
 ### Step 5: Create the Script
-Download the `server.py` from this repository into your folder
+Download the server.py from this repository into your folder.
 
 ### Step 6: Configure RetroArch
 You only need to do this once. Open RetroArch and navigate to the settings:
 1. Go to **Settings > AI Service**:
     * Set **AI Service Enabled** to ON.
-    * Set **AI Service Output** to `Speech Mode`.
-    * Set **AI Service URL** to `http://127.0.0.1:4404/`.
+    * Set **AI Service Output** to Speech Mode.
+    * Set **AI Service URL** to http://127.0.0.1:4404/
 2. Go to **Settings > Input > Hotkeys**:
-    * Scroll down and assign a button to **AI Service**. This is the button you will press in-game to hear the text!
+    * Scroll down and assign a button to **AI Service**. This is the button you will press in-game to extract the text!
+
+---
 
 ## 🎮 How to Play
 1. Open VOICEVOX.
 2. Open a new terminal and run these commands to start the tool:
 ```bash
-cd ~/RetroArch_AI_Server
-source venv/bin/activate
-python3 server.py
+    cd ~/RetroArch_AI_Server
+    source venv/bin/activate
+    python3 server.py
 ```
-3. Open RetroArch and run your game
-4. Have fun!
 
-VOICEVOX and the server tool needs to be running during your gaming session.
+3. Open your web browser and navigate to http://127.0.0.1:4404/logs to open your live dialog tracker.
+4. Open RetroArch and run your game.
+5. Have fun! Hit your hotkey whenever there is text on screen.
+
+Note: VOICEVOX and the server tool must be running in the background during your gaming session.
+
+---
+
+## 📖 Using Yomitan / Dictionary Extensions
+Because this server extracts the raw Japanese text from the game, you can use it alongside browser-based pop-up dictionaries like **Yomitan** (or Yomichan) to instantly look up Kanji you don't know!
+
+1. Install a pop-up dictionary extension like Yomitan in your web browser.
+2. While playing your game, keep http://127.0.0.1:4404/logs open on a second monitor or tucked to the side of your screen.
+3. Every time you press the AI Service hotkey in RetroArch, the web page will instantly update with the latest dialogue in large text, while keeping a history of your last 100 lines below it.
+4. Simply hover your mouse over any unknown word on the webpage to instantly see its reading and definition!
 
 ---
 
 ## ⚙️ Customization (Voice, Volume, and Speed)
 You can easily change how the AI voice sounds to perfectly match the game you are playing. 
 
-Open your `server.py` file in a text editor. Right at the very top of the script, you will see a `--- CONFIGURATION ---` block with three variables you can change:
+Open your server.py file in a text editor. Right at the very top of the script, you will see a CONFIGURATION block with three variables you can change:
 
-* **`VOICEVOX_SPEAKER_ID` (The Character Voice):** The VOICEVOX app comes with dozens of different characters (young heroes, narrators, mascots, etc.). Each character has a specific ID number. The default is `23` (a neutral female voice). You can change this number to cast a different voice actor! Try `13` for a neutral male, `3` for an energetic mascot, or experiment with numbers between `0` and `50` to find your favorite.
-* **`VOICEVOX_SPEED_SCALE` (Reading Speed):** `1.0` is the normal speaking speed. The script defaults to `1.15`, which is comfortably faster for gaming. If you are a beginner and want them to speak slower so you can catch every syllable, try `0.8` or `0.9`. 
-* **`VOICEVOX_VOLUME_SCALE` (Loudness):** Game music can be loud! `1.0` is the baseline volume. The script defaults to `2.0` to help the voice cut through the retro music. If it's still too quiet, bump it up to `3.0` or higher.
+* **VOICEVOX_SPEAKER_ID (The Character Voice):** The VOICEVOX app comes with dozens of different characters (young heroes, narrators, mascots, etc.). Each character has a specific ID number. The default is 23 (a neutral female voice). You can change this number to cast a different voice actor! Try 13 for a neutral male, 3 for an energetic mascot, or experiment with numbers between 0 and 50 to find your favorite.
+* **VOICEVOX_SPEED_SCALE (Reading Speed):** 1.0 is the normal speaking speed. The script defaults to 1.15, which is comfortably faster for gaming. If you are a beginner and want them to speak slower so you can catch every syllable, try 0.8 or 0.9. 
+* **VOICEVOX_VOLUME_SCALE (Loudness):** Game music can be loud! 1.0 is the baseline volume. The script defaults to 2.0 to help the voice cut through the retro music. If it's still too quiet, bump it up to 3.0 or higher.
 
-Whenever you change these numbers, just save the `server.py` file and restart the server in your Terminal for the changes to take effect!
+Whenever you change these numbers, just save the server.py file and restart the server in your Terminal for the changes to take effect!
